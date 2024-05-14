@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Load static files -->
+    {% load static %}
+    <!-- Link to CSS file -->
+    <link rel="stylesheet" type="text/css" href="{% static 'onlinecourse/course.css' %}">
+    <meta charset="UTF-8">
+    <title>Online Courses</title>
+</head>
+<body>
+    <!-- Check if user is authenticated -->
+    {% if user.is_authenticated %}
+    <!-- Display dropdown for authenticated user -->
+    <div class="rightalign">
+        <div class="dropdown">
+            <!-- Display user's first name as button -->
+            <button class="dropbtn">{{user.first_name}}</button>
+            <div class="dropdown-content">
+                <!-- Logout option -->
+                <a href="{% url 'onlinecourse:logout' %}">Logout</a>
+            </div>
+        </div>
+    </div>
+    <!-- If user is not authenticated -->
+    {% else %}
+    <!-- Display dropdown for non-authenticated user -->
+    <div class="rightalign">
+        <div class="dropdown">
+            <!-- Form for signup/login -->
+            <form action="{% url 'onlinecourse:registration' %}" method="get">
+                <!-- Button to indicate visitor status -->
+                <input class="dropbtn"  type="submit" value="Visitor">
+                <div class="dropdown-content">
+                    <!-- Signup and login options -->
+                    <a href="{% url 'onlinecourse:registration' %}">Signup</a>
+                    <a href="{% url 'onlinecourse:login' %}">Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    <h2>Popular courses list</h2>
+    <hr>
+    <!-- Check if course list exists -->
+    {% if course_list %}
+    <!-- Iterate through course list -->
+        <ul>
+        {% for course in course_list %}
+            <!-- Container for each course -->
+            <div class="container">
+              <div class="row">
+                  <!-- Display course image -->
+                  <div class="column-33">
+                    <img src="{{MEDIA_URL}}/{{ course.image }}" width="360" height="360" >
+                </div>
+                <!-- Display course details -->
+                <div class="column-66">
+                    <!-- Course name -->
+                    <h1 class="xlarge-font"><b>{{ course.name }}</b></h1>
+                    <!-- Total enrollment -->
+                    <p style="color:MediumSeaGreen;"><b>{{course.total_enrollment}} enrolled</b></p>
+                    <!-- Course description -->
+                    <p> {{ course.description }}</p>
+                    <!-- Form for course enrollment -->
+                    <form action="{% url 'onlinecourse:enroll' course.id %}" method="post">
+                        {% csrf_token %}
+                    <input class="button"  type="submit"  value="Enroll">
+                  </form>
+                </div>
+              </div>
+            </div>
+            <hr>
+        {% endfor %}
+        </ul>
+    <!-- If no courses available -->
+    {% else %}
+        <p>No courses are available.</p>
+    {% endif %}
+</body>
+</html>
